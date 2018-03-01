@@ -1,0 +1,23 @@
+{
+  "name": "bamazon_cli_mysql_storefront",
+  "version": "1.0.0",
+  "description": "A CLI storefront using MySql",
+  "main": "bamazonCustomer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ashleyedds/bamazon_cli_mysql_storefront.git"
+  },
+  "author": "Ashley Edds",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ashleyedds/bamazon_cli_mysql_storefront/issues"
+  },
+  "homepage": "https://github.com/ashleyedds/bamazon_cli_mysql_storefront#readme",
+  "dependencies": {
+    "inquirer": "^5.1.0",
+    "mysql": "^2.15.0"
+  }
+}
