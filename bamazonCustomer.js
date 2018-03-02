@@ -71,7 +71,7 @@ function initStore() {
             }
 
             //grab quantity requested to purchase
-            var itemAmount = response.itemQuantity;
+            var itemAmount = parseInt(response.itemQuantity);
 
             //check to see if there is enough stock
             if (chosenItem.stock_quantity < itemAmount) {
