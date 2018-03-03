@@ -1,18 +1,18 @@
-var mysql = require("mysql");
-var inquirer = require("inquirer");
-var Table = require("cli-Table");
+const mysql = require("mysql");
+const inquirer = require("inquirer");
+const Table = require("cli-Table");
 
-var connection = mysql.createConnection(
+const connection = mysql.createConnection(
     {
         host: "localhost",
         port: 3306,
         user: "root",
-        password: "pepper12",
+        password: "",
         database: "bamazon"
     }
 );
 
-connection.connect(function (err) {
+connection.connect((err) => {
     if (err) throw err;
     console.log("\nWelcome to manager view.\n");
 
@@ -27,7 +27,7 @@ function initManager() {
             message: "\nWhat would you like to do?\n",
             choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product", "Quit"]
         }
-    ]).then(function (response) {
+    ]).then((response) => {
         if (response.task === "View Products for Sale") {
             viewProducts();
             return;
@@ -56,9 +56,9 @@ function initManager() {
 };
 
 function viewProducts() {
-    connection.query("select * from products", function (err, results) {
+    connection.query("select * from products", (err, results) => {
 
-        var table = new Table({
+        let table = new Table({
             chars: {
                 "top": "═", "top-mid": "╤", "top-left": "╔", "top-right": "╗",
                 "bottom": "═", "bottom-mid": "╧", "bottom-left": "╚", "bottom-right": "╝",
@@ -70,7 +70,7 @@ function viewProducts() {
         table.push(
             ["ID", "Product", "Department", "Price", "Stock"]);
 
-        for (var i = 0; i < results.length; i++) {
+        for (let i = 0; i < results.length; i++) {
             table.push(
                 [results[i].item_id, results[i].product_name, results[i].department_name, results[i].price, results[i].stock_quantity]
             );
@@ -83,10 +83,10 @@ function viewProducts() {
 };
 
 function viewLow() {
-    connection.query("select * from products where stock_quantity < 5", function (err, results) {
+    connection.query("select * from products where stock_quantity < 5", (err, results) => {
         if (err) throw err
         console.log("Here are the products with less than 5 items:\n");
-        for (var i = 0; i < results.length; i++) {
+        for (let i = 0; i < results.length; i++) {
             console.log(results[i].item_id + ". " + results[i].product_name + " has only " + results[i].stock_quantity + " remaining in stock");
         }
         initManager();
@@ -94,15 +94,15 @@ function viewLow() {
 };
 
 function addInventory() {
-    connection.query("select * from products", function (err, results) {
+    connection.query("select * from products", (err, results) => {
         inquirer.prompt([
             {
                 name: "item",
                 type: "list",
                 message: "Which item would you like to add inventory?",
-                choices: function () {
-                    var itemArray = [];
-                    for (var i = 0; i < results.length; i++) {
+                choices: () => {
+                    let itemArray = [];
+                    for (let i = 0; i < results.length; i++) {
                         itemArray.push(results[i].product_name);
                     }
                     return itemArray;
@@ -113,17 +113,17 @@ function addInventory() {
                 type: "input",
                 message: "How many would you like to add?"
             }
-        ]).then(function (response) {
-            var chosenItem;
-            for (var i = 0; i < results.length; i++) {
+        ]).then((response) => {
+            let chosenItem;
+            for (let i = 0; i < results.length; i++) {
                 if (results[i].product_name === response.item) {
                     chosenItem = results[i]
                 }
             }
 
-            var itemAmount = parseInt(response.quantity);
+            let itemAmount = parseInt(response.quantity);
 
-            var newStock = parseInt(chosenItem.stock_quantity) + itemAmount;
+            let newStock = parseInt(chosenItem.stock_quantity) + itemAmount;
 
             connection.query("UPDATE products SET ? WHERE ?",
                 [{
@@ -140,7 +140,7 @@ function addInventory() {
 };
 
 function newProduct() {
-    connection.query("select * from products", function (err, results) {
+    connection.query("select * from products", (err, results) => {
         inquirer.prompt([
             {
                 name: "newItem",
@@ -162,10 +162,10 @@ function newProduct() {
                 type: "input",
                 message: "How much stock of this item are you adding?"
             }
-        ]).then(function (response) {
-            var sql = "INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES ?";
+        ]).then((response) => {
+            let sql = "INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES ?";
 
-            var values = [[response.newItem, response.newDepartment, parseFloat(response.newPrice), parseInt(response.newStock)]];
+            let values = [[response.newItem, response.newDepartment, parseFloat(response.newPrice), parseInt(response.newStock)]];
 
             connection.query(sql, [values], function (err, results) {
                 if (err) throw err;

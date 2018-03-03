@@ -1,18 +1,18 @@
-var mysql = require("mysql");
-var inquirer = require("inquirer");
-var Table = require("cli-table");
+const mysql = require("mysql");
+const inquirer = require("inquirer");
+const Table = require("cli-table");
 
-var connection = mysql.createConnection(
+const connection = mysql.createConnection(
     {
         host: "localhost",
         port: 3306,
         user: "root",
-        password: "pepper12",
+        password: "",
         database: "bamazon"
     }
 );
 
-connection.connect(function (err) {
+connection.connect((err) => {
     if (err) throw err;
     console.log("\nHello! Welcome to our store!\n");
 
@@ -20,9 +20,9 @@ connection.connect(function (err) {
 });
 
 function initStore() {
-    connection.query("select * from products", function (err, results) {
+    connection.query("select * from products", (err, results) => {
 
-        var table = new Table({
+        let table = new Table({
             chars: { 
                 "top": "═", "top-mid": "╤", "top-left": "╔", "top-right": "╗",
                 "bottom": "═", "bottom-mid": "╧", "bottom-left": "╚", "bottom-right": "╝",
@@ -34,7 +34,7 @@ function initStore() {
         table.push (
             ["ID", "Product", "Department", "Price", "Stock"]);
 
-        for (var i = 0; i < results.length; i++){
+        for (let i = 0; i < results.length; i++){
             table.push (
                 [results[i].item_id, results[i].product_name, results[i].department_name, results[i].price, results[i].stock_quantity]
             );
@@ -48,9 +48,9 @@ function initStore() {
                 name: "itemQuestion",
                 type: "list",
                 message: "\nWhich item would you like to purchase?",
-                choices: function () {
-                    var itemArray = [];
-                    for (var i = 0; i < results.length; i++) {
+                choices: () => {
+                    let itemArray = [];
+                    for (let i = 0; i < results.length; i++) {
                         itemArray.push(results[i].product_name);
                     }
                     return itemArray;
@@ -61,17 +61,17 @@ function initStore() {
                 type: "input",
                 message: "How many would you like to buy?"
             }
-        ]).then(function (response) {
+        ]).then((response) => {
             //grab name of item chosen to purchase
-            var chosenItem;
-            for (var i = 0; i < results.length; i++) {
+            let chosenItem;
+            for (let i = 0; i < results.length; i++) {
                 if (results[i].product_name === response.itemQuestion) {
                     chosenItem = results[i];
                 }
             }
 
             //grab quantity requested to purchase
-            var itemAmount = parseInt(response.itemQuantity);
+            let itemAmount = parseInt(response.itemQuantity);
 
             //check to see if there is enough stock
             if (chosenItem.stock_quantity < itemAmount) {
@@ -86,7 +86,7 @@ function initStore() {
                     type: "confirm",
                     message: "You have selected to purchase " + itemAmount + " of the " + chosenItem.product_name + ". Are you sure you'd like to buy this?"
                 }
-            ]).then(function(answer){
+            ]).then((answer) => {
                 if (answer.confirm === false){
                     console.log("No worries. Transaction ended. Please come back again!")
                     return connection.end();
@@ -94,11 +94,11 @@ function initStore() {
                 //finish transaction
 
             //calculate total trasaction cost
-            var totalCost = itemAmount * chosenItem.price;
+            let totalCost = itemAmount * chosenItem.price;
             console.log("Your total cost is $" + totalCost);
 
             //subtract amount purchased
-            var newStock = chosenItem.stock_quantity - itemAmount;
+            let newStock = chosenItem.stock_quantity - itemAmount;
 
             //update the database with the new stock quantity
             connection.query("UPDATE products SET ? WHERE ?",
@@ -108,7 +108,7 @@ function initStore() {
                 {
                     product_name: chosenItem.product_name
                 }],
-                function (err, res) {
+                (err, res) => {
                     if (err) {
                         throw err;
                     }
